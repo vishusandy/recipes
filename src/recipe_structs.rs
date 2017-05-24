@@ -3,7 +3,7 @@ use chrono::NaiveDate;
 pub struct Recipe {
     pub rid: u32,
     pub title: String,
-    pub date: NaiveDate, //date
+    pub date: NaiveDate,
     pub contributor: Contrib,
     pub ingredients: String,
     pub directions: String,
@@ -11,13 +11,33 @@ pub struct Recipe {
 
 pub struct Contrib {
     pub cid: u32,
-    pub added: NaiveDate, //date
+    pub added: NaiveDate,
     pub name: String,
     pub city: String,
     pub state: String,
     pub comments: String,
-    
 }
+
+pub enum ResultR<'a> {
+    Recipe,
+    Fail(&'a str), //maybe write as Fail(T) instead
+}
+
+pub enum ResultC<'a> {
+    Contrib,
+    Fail(&'a str),
+}
+
+pub enum RecipeIdx {
+    NotIndexed,
+    Index(u32),
+}
+
+pub enum ContribIdx {
+    NotIndexed,
+    Index(u32),
+}
+
 
 pub struct RecipeConfig {
     pub num_recipes: u32,
@@ -26,8 +46,9 @@ pub struct RecipeConfig {
     pub ai_cid: u32,
 }
 
-pub enum DateFmt {
+pub enum DateFmt<'a> {
     Ymd,
     Mdy,
+    Fail(&'a str),
     None,
 }
