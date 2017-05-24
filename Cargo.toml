@@ -1,0 +1,8 @@
+[package]
+name = "recipes"
+version = "0.1.0"
+authors = ["Andrew <prindle.andrew@gmail.com>"]
+
+[dependencies]
+chrono = "0.3"
+regex = "0.2"
