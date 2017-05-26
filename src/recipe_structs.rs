@@ -1,17 +1,19 @@
-use chrono::NaiveDate;
+use chrono::Date;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Recipe {
     pub rid: u32, //todo: convert to RecipeIdx instead of u32
     pub title: String,
-    pub date: NaiveDate,
-    pub contributor: u32,
+    pub date: String,
+    pub contributor: u32, //todo: change to &Contrib
     pub ingredients: String,
     pub directions: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Contrib {
     pub cid: u32, //todo: convert to ContribIdx instead of u32
-    pub added: NaiveDate,
+    pub added: String,
     pub name: String,
     pub city: String,
     pub state: String,
@@ -38,7 +40,7 @@ pub enum ContribIdx {
     Index(u32),
 }
 
-
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RecipeConfig {
     pub num_recipes: u32,
     pub num_contribs: u32,

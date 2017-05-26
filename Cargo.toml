@@ -6,3 +6,6 @@ authors = ["Andrew <prindle.andrew@gmail.com>"]
 [dependencies]
 chrono = "0.3"
 regex = "0.2"
+serde = "1.0.8"
+serde_derive = "1.0.8"
+rmp-serde = "0.13.1"

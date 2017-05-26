@@ -53,6 +53,6 @@ impl RecipeConfig {
     }
     
     pub fn show_config(&self) {
-        println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}", self.num_contribs, self.num_recipes, self.ai_rid, self.ai_cid);
+        println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", self.num_contribs, self.num_recipes, self.ai_rid, self.ai_cid);
     }
 }
