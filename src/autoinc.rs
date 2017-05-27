@@ -1,4 +1,6 @@
 
+
+use CFG;
 use recipe_structs::*;
 use entries::*;
 use helpers::*;
@@ -6,6 +8,26 @@ use chrono::NaiveDate;
 
 
 impl RecipeConfig {
+    pub fn nextrid() -> u32 {
+        unsafe {
+            let t = (*CFG).ai_rid;
+            // (*CFG).ai_rid += 1;
+            t
+        }
+    }
+
+    pub fn previewrid() -> u32 {
+        unsafe {
+            (*CFG).ai_rid
+        }
+    }
+    pub fn incrid() -> u32 {
+        unsafe {
+            // (*CFG).ai_rid += 1;
+            return (*CFG).ai_rid
+        }
+    }
+
     pub fn nextrecipe(&mut self) -> u32 { // returns the next available rid from the config
         let t = self.ai_rid;
         self.ai_rid += 1;

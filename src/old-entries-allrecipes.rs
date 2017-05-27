@@ -1,3 +1,33 @@
+    //serializer
+    let mut buf = Vec::new();
+    recipelist.serialize(&mut Serializer::new(&mut buf)).unwrap();
+    println!("Serialize Item buffer: \n{:?}\n", buf);
+    //deserializer
+    let mut ds = Deserializer::new(&buf[..]);
+    let mut uns: Vec<Recipe> = Deserialize::deserialize(&mut ds).unwrap();
+    for item in uns {
+        item.display();
+    }
+    
+    
+
+let mut rcfg: RecipeConfig = RecipeConfig::config();
+// static mut CFG: *const u32 = &mut rcfg as *const u32;
+// static mut CFG: *mut u32 = &mut rcfg;
+// static mut GCFG: RecipeConfig = RecipeConfig::new();
+unsafe {
+    CFG = mem::transmute(&rcfg);
+}
+
+unsafe {
+    println!("\n\nConfig[ai_rid] = {}\n", (*CFG).ai_rid);
+}
+
+pub fn setconfig(rcfg: &mut RecipeConfig) {
+        unsafe {
+            CFG = mem::transmute(&rcfg);
+        }
+} 
 
 const GSP: u8 = 29;
 const RSP: u8 = 30;
@@ -8,20 +38,6 @@ const EOT: u8 = 3;
 const IDX: char = '\u{0084}';
 const SOS: char = '\u{0098}';
 const EOS: char = '\u{009c}';
-
-
-
-
-        let mut buf = Vec::new();
-        recipelist.serialize(&mut Serializer::new(&mut buf)).unwrap();
-        println!("Serialize Item buffer: \n{:?}\n", buf);
-        
-        let mut ds = Deserializer::new(&buf[..]);
-        let mut uns: Vec<Recipe> = Deserialize::deserialize(&mut ds).unwrap();
-        for item in uns {
-            item.display();
-        }
- 
  
  
  

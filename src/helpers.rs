@@ -2,11 +2,17 @@ use regex::Regex;
 use std::io::BufReader;
 use std::io::BufRead;
 use std::fs::File;
+use std::mem;
 
 use chrono::NaiveDate;
 use recipe_structs::*;
 use autoinc::*;
 use entries::*;
+
+use CFG;
+
+// static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
+
 
 
 pub fn date_format(d: &str) -> DateFmt {
@@ -21,8 +27,23 @@ pub fn date_format(d: &str) -> DateFmt {
                    },
     }
 }
+ 
+pub fn show_config() {
+    
+    // println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", self.num_contribs, self.num_recipes, self.ai_rid, self.ai_cid);
+    
+    // println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", CFG.num_contribs, CFG.num_recipes, CFG.ai_rid, CFG.ai_cid);
+    // println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", (*CFG).num_contribs, (*CFG).num_recipes, (*CFG).ai_rid, (*CFG).ai_cid);
+    unsafe {
+        //(*Self::CFG).ai_rid  also seems to work, at least when &self was used as a parameter
+        println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", (*CFG).num_contribs, (*CFG).num_recipes, (*CFG).ai_rid, (*CFG).ai_cid);
+        // println!("\n\nConfig:\n{:?}\n\n", *CFG);
+    }
+}
 
 impl RecipeConfig {
+    /* */
+    
     pub fn config() -> RecipeConfig {
         let mut nr: u32  = 0;
         let mut nc: u32  = 0;
@@ -52,7 +73,9 @@ impl RecipeConfig {
         }
     }
     
-    pub fn show_config(&self) {
-        println!("Config:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", self.num_contribs, self.num_recipes, self.ai_rid, self.ai_cid);
+    pub fn new() -> RecipeConfig {
+        RecipeConfig::config()
     }
+    
+
 }

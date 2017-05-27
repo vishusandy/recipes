@@ -11,6 +11,7 @@ use recipe_structs::*;
 use autoinc::*;
 use helpers::*;
 
+
 impl Recipe {    
     pub fn display(&self) {
         println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\n\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions);

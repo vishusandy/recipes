@@ -32,19 +32,20 @@ use recipe_structs::*;
 use autoinc::*;
 use entries::*;
 
+    static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
 
 fn main() {
     
     let mut rcfg: RecipeConfig = RecipeConfig::config();
-    // static mut CFG: *const u32 = &mut rcfg as *const u32;
-    // static mut CFG: *mut u32 = &mut rcfg;
-    static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
+    
     unsafe {
         CFG = mem::transmute(&rcfg);
+        // (*CFG).num_contribs = 100u32;
     }
+    rcfg.num_contribs = 100u32;
     
-    
-    rcfg.show_config();
+    show_config();
+    // rcfg.show_config();
     
     
     let mut recipelist: Vec<Recipe> = vec![
@@ -88,22 +89,9 @@ fn main() {
     }
     
     
-    rcfg.show_config();
-    unsafe {
-        println!("\n\nConfig[ai_rid] = {}\n", (*CFG).ai_rid);
-    }
-    /*
-    let mut buf = Vec::new();
-    recipelist.serialize(&mut Serializer::new(&mut buf)).unwrap();
-    println!("Serialize Item buffer: \n{:?}\n", buf);
-    */
-    /*
-    let mut ds = Deserializer::new(&buf[..]);
-    let mut uns: Vec<Recipe> = Deserialize::deserialize(&mut ds).unwrap();
-    for item in uns {
-        item.display();
-    }
-    */
+    show_config();
+    // rcfg.show_config();
+
     
     
     
