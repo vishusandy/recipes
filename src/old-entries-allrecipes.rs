@@ -1,3 +1,31 @@
+
+const GSP: u8 = 29;
+const RSP: u8 = 30;
+const USP: u8 = 31;
+const SOT: u8 = 2;
+const EOT: u8 = 3;
+
+const IDX: char = '\u{0084}';
+const SOS: char = '\u{0098}';
+const EOS: char = '\u{009c}';
+
+
+
+
+        let mut buf = Vec::new();
+        recipelist.serialize(&mut Serializer::new(&mut buf)).unwrap();
+        println!("Serialize Item buffer: \n{:?}\n", buf);
+        
+        let mut ds = Deserializer::new(&buf[..]);
+        let mut uns: Vec<Recipe> = Deserialize::deserialize(&mut ds).unwrap();
+        for item in uns {
+            item.display();
+        }
+ 
+ 
+ 
+ 
+ 
     pub fn readrecipe(id: u32) -> Recipe {
         let rid: u32 = 0;
         let title = String::new();

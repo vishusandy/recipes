@@ -2,9 +2,9 @@ use chrono::Date;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Recipe {
-    pub rid: u32, //todo: convert to RecipeIdx instead of u32
+    pub rid: u32, //todo: convert to `type RecipeIdx = u32` or enum RecipeIdx instead of u32
     pub title: String,
-    pub date: String,
+    pub date: String, //change to NaiveDate
     pub contributor: u32, //todo: change to &Contrib
     pub ingredients: String,
     pub directions: String,

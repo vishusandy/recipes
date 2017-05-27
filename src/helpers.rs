@@ -5,7 +5,7 @@ use std::fs::File;
 
 use chrono::NaiveDate;
 use recipe_structs::*;
-use recipe_impl::*;
+use autoinc::*;
 use entries::*;
 
 

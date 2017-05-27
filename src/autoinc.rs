@@ -5,6 +5,21 @@ use helpers::*;
 use chrono::NaiveDate;
 
 
+impl RecipeConfig {
+    pub fn nextrecipe(&mut self) -> u32 { // returns the next available rid from the config
+        let t = self.ai_rid;
+        self.ai_rid += 1;
+        t
+    } 
+    pub fn previewrecipe(&self) -> u32 {
+        self.ai_rid
+    }
+    pub fn increcipe(&mut self) -> u32 { // returns the rid + 1 (the rid after incremented)
+        self.ai_rid += 1;
+        self.ai_rid
+    }
+}
+
 pub trait AutoInc {
     fn next(&mut RecipeConfig) -> RecipeIdx;
     fn preview(&RecipeConfig) -> u32;
@@ -14,7 +29,8 @@ pub trait AutoInc {
 
 impl AutoInc for RecipeIdx {
     fn next(c: &mut RecipeConfig) -> RecipeIdx {
-        RecipeIdx::Index(c.ai_rid)
+        RecipeIdx::Index(Self::inc(c)-1)
+        // RecipeIdx::Index(c.ai_rid)
     }
     fn preview(c: &RecipeConfig) -> u32 {
         c.ai_rid
