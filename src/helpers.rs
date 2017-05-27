@@ -13,7 +13,33 @@ use CFG;
 
 // static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
 
+static mut CONF: *const RecipeConfig = 0 as *const RecipeConfig;
 
+pub fn setconf(c: &RecipeConfig) {
+    
+    unsafe {
+        CONF = mem::transmute(c);
+    }
+    
+}
+
+pub fn showconf() {
+    unsafe {
+        println!("Showing Conf:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", (*CONF).num_contribs, (*CONF).num_recipes, (*CONF).ai_rid, (*CONF).ai_cid);
+    }
+}
+
+pub fn testcontrib(c: &mut RecipeConfig) {
+    
+    c.num_contribs = 500;
+    
+    let mut m: &mut RecipeConfig; 
+    unsafe {
+        m = mem::transmute(CONF);
+    }
+    m.num_contribs = 333;
+    
+}
 
 pub fn date_format(d: &str) -> DateFmt {
     let ymd = Regex::new("(?P<year>[0-9]{2}(?:[0-9]{2})?)[\\./-](?P<month>[0-1]?[0-9])[\\./-](?P<day>[0-3]?[0-9])").unwrap();

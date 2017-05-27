@@ -44,6 +44,11 @@ fn main() {
     }
     rcfg.num_contribs = 100u32;
     
+    setconf(&rcfg);
+    
+    showconf();
+    testcontrib(&mut rcfg);
+    
     show_config();
     // rcfg.show_config();
     
@@ -84,12 +89,15 @@ fn main() {
     Recipe::writerecipes(&mut rcfg, &mut rlist);
     Recipe::readrecipes(&mut rcfg, &mut rlist);
     
-    for item in rlist {
-        item.display();
-    }
+    // for item in rlist {
+        // item.display();
+    // }
     
     
     show_config();
+    showconf();
+    
+    // show_config();
     // rcfg.show_config();
 
     

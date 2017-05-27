@@ -9,11 +9,15 @@ use chrono::NaiveDate;
 
 impl RecipeConfig {
     pub fn nextrid() -> u32 {
+        let mut m: &mut RecipeConfig; 
+        let mut t: u32;
         unsafe {
-            let t = (*CFG).ai_rid;
+            t = (*CFG).ai_rid;
+            m = mem::transmute(CFG);
+            m.ai_rid += 1;
             // (*CFG).ai_rid += 1;
-            t
         }
+        t
     }
 
     pub fn previewrid() -> u32 {
@@ -22,9 +26,13 @@ impl RecipeConfig {
         }
     }
     pub fn incrid() -> u32 {
+        let mut m: &mut RecipeConfig; 
         unsafe {
+            m = mem::transmute(CFG);
+            m.ai_rid += 1;
             // (*CFG).ai_rid += 1;
-            return (*CFG).ai_rid
+            // return (*CFG).ai_rid
+            return m.ai_rid
         }
     }
 
