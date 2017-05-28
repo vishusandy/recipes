@@ -9,7 +9,6 @@
         item.display();
     }
     
-    
 
 let mut rcfg: RecipeConfig = RecipeConfig::config();
 // static mut CFG: *const u32 = &mut rcfg as *const u32;
@@ -28,6 +27,59 @@ pub fn setconfig(rcfg: &mut RecipeConfig) {
             CFG = mem::transmute(&rcfg);
         }
 } 
+
+
+
+//helpers.rs
+static mut CONF: *const RecipeConfig = 0 as *const RecipeConfig;
+
+pub fn setconf(c: &RecipeConfig) {
+    
+    unsafe {
+        CONF = mem::transmute(c);
+    }
+    
+}
+
+pub fn showconf() {
+    unsafe {
+        println!("Showing Conf:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", (*CONF).num_contribs, (*CONF).num_recipes, (*CONF).ai_rid, (*CONF).ai_cid);
+    }
+}
+
+pub fn testcontrib(c: &mut RecipeConfig) {
+    
+    c.num_contribs = 500;
+    
+    let mut m: &mut RecipeConfig; 
+    unsafe {
+        m = mem::transmute(CONF);
+    }
+    m.num_contribs = 333;
+    
+}
+
+
+pub enum RecipeIdx {
+    NotIndexed,
+    Index(u32),
+}
+
+pub enum ContribIdx {
+    NotIndexed,
+    Index(u32),
+}
+
+
+
+
+setconf(&rcfg);
+showconf();
+testcontrib(&mut rcfg);
+rcfg.show_config();
+
+
+
 
 const GSP: u8 = 29;
 const RSP: u8 = 30;

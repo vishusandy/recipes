@@ -5,12 +5,15 @@ use rmps::{Deserializer, Serializer};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter};
-// use std::mem;
+use std::mem;
+use std::collections::hash_map::Entry::{Vacant, Occupied};
+use std::collections::HashMap;
 // use chrono::NaiveDate;
 use recipe_structs::*;
 use autoinc::*;
 use helpers::*;
 
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT};
 
 impl Recipe {    
     pub fn display(&self) {
@@ -27,70 +30,136 @@ impl Recipe {
         (rid, title, date, contributor, ingredients, directions,)
     }
 
-    pub fn add(&self, c: &mut RecipeConfig, list: &mut Vec<Recipe>) -> u32 {
+    pub fn add(&self) -> u32 {
+        let mut l: &mut Vec<Recipe>; 
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        unsafe {
+            l = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+        }
+        
         let rid = match self.rid {
-            0 => c.nextrecipe(),
+            0 => RecipeConfig::nextrid(),
             x => x,
         };
-        list.push(Recipe {
+        // list.push(Recipe {
+        l.push(Recipe {
             rid: rid, title: self.title.to_owned(), date: self.date.to_owned(), contributor: self.contributor, ingredients: self.ingredients.to_owned(), directions: self.directions.to_owned()
         });
+        rdict.insert(rid, l.last_mut().unwrap());
         rid
     }
-    pub fn add_recipe(c: &mut RecipeConfig, list: &mut Vec<Recipe>, r: &Recipe) -> u32 {
+
+    pub fn add_recipe(r: &Recipe) -> u32 {
         // let (rid, title, date, contributor, ingredients, directions) = r.tuple();
+        let mut list: &mut Vec<Recipe>;
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        unsafe {
+            list = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+        }
         let rid = match r.rid {
-            0 => c.nextrecipe(),
+            0 => RecipeConfig::nextrid(),
             x => x,
         };
         list.push(Recipe {
             rid: rid, title: r.title.to_owned(), date: r.date.to_owned(), contributor: r.contributor, ingredients: r.ingredients.to_owned(), directions: r.directions.to_owned()
             // rid, title, date, contributor, ingredients, directions
         });
+        rdict.insert(rid, list.last_mut().unwrap());
         rid
     }
     
-    pub fn new(c: &mut RecipeConfig, list: &mut Vec<Recipe>, id: u32, title: String, date: String, contributor: u32, ingredients: String, directions: String) -> u32 {
+    pub fn new(id: u32, title: String, date: String, contributor: u32, ingredients: String, directions: String) -> u32 {
+        let mut list: &mut Vec<Recipe>;
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        unsafe {
+            list = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+        }
         let rid = match id {
-            0 => c.nextrecipe(),
+            0 => RecipeConfig::nextrid(),
             x => x,
         };
         list.push(Recipe {
             rid, title, date, contributor, ingredients, directions
             // rid: self.rid, title: self.title.to_owned(), date: self.date.to_owned(), contributor: self.contributor, ingredients: self.ingredients.to_owned(), directions: self.directions.to_owned()
         });
-        
+        rdict.insert(rid, list.last_mut().unwrap());
         rid
     }
     
-    pub fn search_rid() {
+    pub fn search_rid<'a>(id: u32) -> ResultR<'a> {
         
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        unsafe {
+            rdict = mem::transmute(RECIPEDICT);
+        }
+        match rdict.get(&id) {
+            None => ResultR::Fail("Entry not found"),
+            Some(r) => ResultR::Result(&r),
+        }
+        /*
+        match rdict.contains_key(&id) {
+            false => ResultR::Fail("Entry not found"),
+            true  => ResultR::Result(rdict.get(&id)),
+        }*/
     }
-    pub fn search_text() {
-        
-    }
-    pub fn search_contrib() {
-        
+    pub fn search_text<'a>(textin: &str) -> Vec<&'a Recipe> {
+        let textlower = textin.to_lowercase();
+        let text = textlower.as_str();
+        let mut results: Vec<&Recipe> = Vec::new();
+        let list: &Vec<Recipe>;
+        unsafe {
+            list = mem::transmute(RECIPELIST);
+        }
+        for item in list {
+            // if item + 5 == 0 {}
+            // todo: match against date and possibly maybe contributor information?
+            if item.title.to_lowercase().contains(text) || item.ingredients.to_lowercase().contains(text) || item.directions.to_lowercase().contains(text) {
+                results.push(item);
+            }
+        }
+        results
     }
     
     //write all recipes in a collection to file
-    pub fn writerecipes(c: &mut RecipeConfig, list: &Vec<Recipe>) -> bool {
-        let mut success = false;
+    pub fn writerecipes() -> bool {
+        let mut success = true;
+        let mut list: &mut Vec<Recipe>;
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        let mut m: &mut RecipeConfig;
+        unsafe {
+            m = mem::transmute(CFG);
+            list = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+        }
         let mut fs = File::create("recipes.db");
         
-        let mut f = BufWriter::new(fs.expect("Could not open file"));
+        let mut f = BufWriter::new(fs.expect("Could not open recipe database"));
         let mut buf = Vec::new();
         list.serialize(&mut Serializer::new(&mut buf)).expect("Could not serialze recipes");
         // println!("Serialize Item buffer: \n{:?}\n", buf);
         
         f.write(&buf);
-        c.num_recipes = list.len() as u32;
+        
+        m.num_recipes = list.len() as u32;
+        
+        // c.num_recipes = list.len() as u32;
         // f.sync_all();
         success
     }
 
-    pub fn readrecipes(c: &mut RecipeConfig, list: &mut Vec<Recipe>) -> bool {
-        let mut success = false;
+    pub fn readrecipes() -> bool {
+        let mut success = true;
+        let mut list: &mut Vec<Recipe>;
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        let mut cfg: &mut RecipeConfig;
+        unsafe {
+            list = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+            cfg = mem::transmute(CFG);
+        }
         
         let mut f = File::open("recipes.db").expect("Could not open recipes database");
         
@@ -99,8 +168,23 @@ impl Recipe {
         // println!("\nFile Contents:\n{:?}\n", buffer);
         let mut ds = Deserializer::new(&buffer[..]);
         *list = Deserialize::deserialize(&mut ds).expect("Could not deserialize recipe data");
+        cfg.num_recipes = list.len() as u32;
         
-        c.num_recipes = list.len() as u32;
+        rdict.clear();
+        let mut maxrid = 0;
+        for item in list { // item = &mut Recipe
+            // println!("\nReading:\n{:?}", item);
+            if item.rid > maxrid {
+                maxrid = item.rid;
+            }
+            rdict.insert(item.rid, item);
+        }
+        // let maxrid = list.iter().max().unwrap_or(0) + 1;
+        
+        cfg.ai_rid = maxrid + 1;
+        cfg.num_recipes = rdict.len() as u32;
+        println!("Max rid: {}", maxrid);
+        println!("Number of recipes: {}", rdict.len());
         
         success
     }

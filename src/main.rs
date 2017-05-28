@@ -20,38 +20,45 @@ extern crate rmp_serde as rmps;
 
 mod helpers;
 mod entries;
+mod people;
 mod recipe_structs;
 mod autoinc;
 
 use serde::{Deserialize, Serialize};
 use rmps::{Deserializer, Serializer};
 use std::mem;
+use std::collections::HashMap;
 
+use autoinc::*;
 use helpers::*;
 use recipe_structs::*;
-use autoinc::*;
 use entries::*;
+use people::*;
 
-    static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
+static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
+static mut RECIPELIST: *const Vec<Recipe> = 0 as *const Vec<Recipe>;
+static mut RECIPEDICT: *const HashMap<u32, &mut Recipe> = 0 as *const HashMap<u32, &mut Recipe>;
+static mut CONTRIBLIST: *const Vec<Contrib> = 0 as *const Vec<Contrib>;
+static mut CONTRIBDICT: *const HashMap<u32, &mut Contrib> = 0 as *const HashMap<u32, &mut Contrib>;
 
 fn main() {
     
-    let mut rcfg: RecipeConfig = RecipeConfig::config();
+    // let mut rcfg: RecipeConfig = RecipeConfig::config();
+    let mut rcfg: RecipeConfig = RecipeConfig::new();
+    let mut rlist: Vec<Recipe> = Vec::new();
+    let mut rdict: HashMap<u32, &mut Recipe> = HashMap::new();
+    let mut clist: Vec<Contrib> = Vec::new();
+    let mut cdict: HashMap<u32, &mut Contrib> = HashMap::new();
     
     unsafe {
         CFG = mem::transmute(&rcfg);
-        // (*CFG).num_contribs = 100u32;
+        RECIPELIST = mem::transmute(&rlist);
+        RECIPEDICT = mem::transmute(&rdict);
+        CONTRIBLIST = mem::transmute(&clist);
+        CONTRIBDICT = mem::transmute(&cdict);
     }
-    rcfg.num_contribs = 100u32;
     
-    setconf(&rcfg);
-    
-    showconf();
-    testcontrib(&mut rcfg);
-    
-    show_config();
-    // rcfg.show_config();
-    
+    // show_config();
     
     let mut recipelist: Vec<Recipe> = vec![
         Recipe {
@@ -72,39 +79,57 @@ fn main() {
         },
     ];
     
+    let mut peoples: Vec<Contrib> = vec![
+        Contrib {
+            cid: 0u32,
+            added: String::from("2017-05-28"),
+            name: String::from("Andrew Prindle"),
+            city: String::from("Madison"),
+            state: String::from("Wi"),
+            comments: String::from("The best person ever in the world"),
+        },
+        Contrib {
+            cid: 0u32,
+            added: String::from("2017-05-28"),
+            name: String::from("Jason Smith"),
+            city: String::from("Madison"),
+            state: String::from("Wi"),
+            comments: String::from("The most awesomest neighbor, super nicest person you;ll ever meet"),
+        },
+        Contrib {
+            cid: 0u32,
+            added: String::from("2017-05-28"),
+            name: String::from("Kelly"),
+            city: String::from("Madison"),
+            state: String::from("Wi"),
+            comments: String::from("She has an awesome dog named Rosebud and a really an adorable son named Owen."),
+        }
+    ];
     
-    let mut rlist: Vec<Recipe> = Vec::new();
+    peoples[0].add();
+    peoples[1].add();
+    peoples[2].add();
+    Contrib::writecontribs();
+    Contrib::readcontribs();
     
-    recipelist[0].add(&mut rcfg, &mut rlist);
-    recipelist[1].add(&mut rcfg, &mut rlist);
+    recipelist[0].add();
+    recipelist[1].add();
+    Recipe::writerecipes();
+    Recipe::readrecipes();
     
-    // rlist.push(Recipe::add(&rlist, recipelist[0]));
-    // rlist.push(Recipe::add(&rlist, recipelist[1]));
-    
-    // let mut recipelist2: Vec<Recipe> = Vec::new();
-    
-    // Recipe::writerecipes(&mut recipelist);
-    // Recipe::readrecipes(&mut recipelist);
-    
-    Recipe::writerecipes(&mut rcfg, &mut rlist);
-    Recipe::readrecipes(&mut rcfg, &mut rlist);
-    
-    // for item in rlist {
-        // item.display();
-    // }
-    
-    
+    // Contrib::writecontribs();
+    // Contrib::readcontribs();
     show_config();
-    showconf();
-    
-    // show_config();
-    // rcfg.show_config();
 
+    for (_, rec) in rdict {
+        rec.display();
+    }
+    for (_, ctb) in cdict {
+        ctb.display();
+    }
+
+    show_config();
     
-    
-    
-    
-    
-    
+    // RecipeConfig::write();
     
 }

@@ -1,0 +1,35 @@
+try changing match statement in search_rid or search_cid from
+	Some(r/c) => ..
+	to
+	Some(ref r/c) => ..
+
+
+
+add methods and globals for contributors
+
+
+Do not read config, calculate config variables internally
+	Do not save config to file or read from file
+change RecipeConfig impl
+	eidt new() method to return a blank RecipeConfig
+
+in main() change RecipeConfig::config() to RecipeConfig::new()
+
+
+change date in Recipe and added in Contributor to NaiveDate's from the chrono crate
+write custom code to implement serialization & deserialization on NaiveDate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

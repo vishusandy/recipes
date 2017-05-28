@@ -1,0 +1,30 @@
+// Display all items in dictionary
+    for (rid, item) in &rdict {
+        println!("Item #{}\n{:?}\n\n", rid, item);
+    }
+
+// Search Recipes for text string
+    println!("\n----SEARCHING----------------");
+    let searchstr: String = "add".to_string();
+    let tomatoes: Vec<&Recipe> = Recipe::search_text(&searchstr);
+    for item in tomatoes {
+        item.display();
+    }
+    
+// Search Recipes for rid
+    match Recipe::search_rid(20u32) {
+        ResultR::Fail(e) => println!("Search error: {}", e),
+        ResultR::Result(r) => {
+            println!("Found rid: ");
+            Recipe::display(r);
+        },
+    }
+
+// main() add items to list
+    // rlist.push(Recipe::add(&rlist, recipelist[0]));
+    // rlist.push(Recipe::add(&rlist, recipelist[1]));
+    
+    // let mut recipelist2: Vec<Recipe> = Vec::new();
+    
+    // Recipe::writerecipes(&mut recipelist);
+    // Recipe::readrecipes(&mut recipelist);

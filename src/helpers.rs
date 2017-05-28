@@ -1,45 +1,18 @@
 use regex::Regex;
-use std::io::BufReader;
-use std::io::BufRead;
+use std::io::{BufReader, BufRead, BufWriter, Write};
 use std::fs::File;
+use std::prelude::*;
 use std::mem;
 
 use chrono::NaiveDate;
 use recipe_structs::*;
 use autoinc::*;
 use entries::*;
+use people::*;
 
-use CFG;
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT};
 
 // static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
-
-static mut CONF: *const RecipeConfig = 0 as *const RecipeConfig;
-
-pub fn setconf(c: &RecipeConfig) {
-    
-    unsafe {
-        CONF = mem::transmute(c);
-    }
-    
-}
-
-pub fn showconf() {
-    unsafe {
-        println!("Showing Conf:\nnumcontribs = {}\nnumrecipes = {}\nnextrid = {}\nnextcid = {}\n", (*CONF).num_contribs, (*CONF).num_recipes, (*CONF).ai_rid, (*CONF).ai_cid);
-    }
-}
-
-pub fn testcontrib(c: &mut RecipeConfig) {
-    
-    c.num_contribs = 500;
-    
-    let mut m: &mut RecipeConfig; 
-    unsafe {
-        m = mem::transmute(CONF);
-    }
-    m.num_contribs = 333;
-    
-}
 
 pub fn date_format(d: &str) -> DateFmt {
     let ymd = Regex::new("(?P<year>[0-9]{2}(?:[0-9]{2})?)[\\./-](?P<month>[0-1]?[0-9])[\\./-](?P<day>[0-3]?[0-9])").unwrap();
@@ -68,9 +41,24 @@ pub fn show_config() {
 }
 
 impl RecipeConfig {
-    /* */
+    pub fn new() -> RecipeConfig {
+        RecipeConfig {
+            num_recipes: 0u32,
+            num_contribs: 0u32,
+            ai_rid: 1u32,
+            ai_cid: 1u32,
+        }
+    }
     
-    pub fn config() -> RecipeConfig {
+    pub fn write() {
+        let mut f = BufWriter::new(File::create("recipes.cfg").expect("Could not open configuration file."));
+        
+        unsafe {
+            f.write(format!("numcontribs = {}\r\nnumrecipes = {}\r\nnextrid = {}\r\nnextcid = {}\r\n",
+                (*CFG).num_contribs, (*CFG).num_recipes, (*CFG).ai_rid, (*CFG).ai_cid).as_bytes());
+        }
+    }
+    pub fn read() -> RecipeConfig {
         let mut nr: u32  = 0;
         let mut nc: u32  = 0;
         let mut air: u32 = 0;
@@ -99,9 +87,8 @@ impl RecipeConfig {
         }
     }
     
-    pub fn new() -> RecipeConfig {
+    /* pub fn new() -> RecipeConfig {
         RecipeConfig::config()
-    }
+    } */
     
-
 }

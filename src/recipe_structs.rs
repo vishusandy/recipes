@@ -21,24 +21,16 @@ pub struct Contrib {
 }
 
 pub enum ResultR<'a> {
-    Recipe,
+    Result(&'a Recipe),
     Fail(&'a str), //maybe write as Fail(T) instead
 }
 
 pub enum ResultC<'a> {
-    Contrib,
+    Result(&'a Contrib),
     Fail(&'a str),
 }
 
-pub enum RecipeIdx {
-    NotIndexed,
-    Index(u32),
-}
 
-pub enum ContribIdx {
-    NotIndexed,
-    Index(u32),
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RecipeConfig {

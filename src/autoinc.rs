@@ -1,6 +1,6 @@
 
-
-use CFG;
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT};
+use std::mem;
 use recipe_structs::*;
 use entries::*;
 use helpers::*;
@@ -9,86 +9,56 @@ use chrono::NaiveDate;
 
 impl RecipeConfig {
     pub fn nextrid() -> u32 {
-        let mut m: &mut RecipeConfig; 
-        let mut t: u32;
+        let mut cfg: &mut RecipeConfig; 
+        let mut t: u32 = 0;
         unsafe {
-            t = (*CFG).ai_rid;
-            m = mem::transmute(CFG);
-            m.ai_rid += 1;
-            // (*CFG).ai_rid += 1;
+            cfg = mem::transmute(CFG);
+            t = cfg.ai_rid;
+            cfg.ai_rid += 1;
         }
         t
     }
-
+    
+    pub fn nextcid() -> u32 {
+        let mut cfg: &mut RecipeConfig;
+        let mut t: u32 = 0;
+        unsafe {
+            t = (*CFG).ai_cid;
+            cfg = mem::transmute(CFG);
+            cfg.ai_cid += 1;
+        }
+        t
+    }
+    
     pub fn previewrid() -> u32 {
         unsafe {
             (*CFG).ai_rid
         }
     }
-    pub fn incrid() -> u32 {
-        let mut m: &mut RecipeConfig; 
+    
+    pub fn previewcid() -> u32 {
         unsafe {
-            m = mem::transmute(CFG);
-            m.ai_rid += 1;
-            // (*CFG).ai_rid += 1;
-            // return (*CFG).ai_rid
-            return m.ai_rid
+            (*CFG).ai_cid
+        }
+    }
+    
+    pub fn incrid() -> u32 {
+        let mut cfg: &mut RecipeConfig; 
+        unsafe {
+            cfg = mem::transmute(CFG);
+            cfg.ai_rid += 1;
+            cfg.ai_rid
+        }
+    }
+    
+    pub fn inccid() -> u32 {
+        let mut cfg: &mut RecipeConfig;
+        unsafe {
+            cfg = mem::transmute(CFG);
+            cfg.ai_cid += 1;
+            cfg.ai_cid
         }
     }
 
-    pub fn nextrecipe(&mut self) -> u32 { // returns the next available rid from the config
-        let t = self.ai_rid;
-        self.ai_rid += 1;
-        t
-    } 
-    pub fn previewrecipe(&self) -> u32 {
-        self.ai_rid
-    }
-    pub fn increcipe(&mut self) -> u32 { // returns the rid + 1 (the rid after incremented)
-        self.ai_rid += 1;
-        self.ai_rid
-    }
-}
-
-pub trait AutoInc {
-    fn next(&mut RecipeConfig) -> RecipeIdx;
-    fn preview(&RecipeConfig) -> u32;
-    fn inc(&mut RecipeConfig) -> u32;
-    fn add(&mut RecipeConfig, u32) -> u32;
-}
-
-impl AutoInc for RecipeIdx {
-    fn next(c: &mut RecipeConfig) -> RecipeIdx {
-        RecipeIdx::Index(Self::inc(c)-1)
-        // RecipeIdx::Index(c.ai_rid)
-    }
-    fn preview(c: &RecipeConfig) -> u32 {
-        c.ai_rid
-    }
-    fn inc(c: &mut RecipeConfig) -> u32 {
-        c.ai_rid += 1;
-        c.ai_rid
-    }
-    fn add(c: &mut RecipeConfig, n: u32) -> u32 {
-        c.ai_rid += n;
-        c.ai_rid
-    }
-}
-
-impl AutoInc for ContribIdx {
-    fn next(c: &mut RecipeConfig) -> RecipeIdx {
-        RecipeIdx::Index(0)
-    }
-    fn preview(c: &RecipeConfig) -> u32 {
-        c.ai_cid
-    }
-    fn inc(c: &mut RecipeConfig) -> u32 {
-        c.ai_cid += 1;
-        c.ai_cid
-    }
-    fn add(c: &mut RecipeConfig, n: u32) -> u32 {
-        c.ai_cid += n;
-        c.ai_cid
-    }
 }
 
