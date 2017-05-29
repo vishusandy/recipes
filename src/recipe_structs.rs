@@ -1,5 +1,6 @@
 use chrono::Date;
 
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Recipe {
     pub rid: u32, //todo: convert to `type RecipeIdx = u32` or enum RecipeIdx instead of u32
@@ -8,8 +9,8 @@ pub struct Recipe {
     pub contributor: u32, //todo: change to &Contrib
     pub ingredients: String,
     pub directions: String,
+    pub tags: Vec<u16>,
 }
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Contrib {
     pub cid: u32, //todo: convert to ContribIdx instead of u32
@@ -24,20 +25,17 @@ pub enum ResultR<'a> {
     Result(&'a Recipe),
     Fail(&'a str), //maybe write as Fail(T) instead
 }
-
 pub enum ResultC<'a> {
     Result(&'a Contrib),
     Fail(&'a str),
 }
-
-
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RecipeConfig {
     pub num_recipes: u32,
     pub num_contribs: u32,
     pub ai_rid: u32,
     pub ai_cid: u32,
+    pub ai_tid: u16,
 }
 
 pub enum DateFmt<'a> {

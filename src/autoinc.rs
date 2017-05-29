@@ -1,5 +1,5 @@
 
-use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT};
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS};
 use std::mem;
 use recipe_structs::*;
 use entries::*;
@@ -8,6 +8,18 @@ use chrono::NaiveDate;
 
 
 impl RecipeConfig {
+    
+    pub fn nexttid() -> u16 {
+        let mut cfg: &mut RecipeConfig;
+        let mut t: u16 = 0;
+        unsafe {
+            cfg = mem::transmute(CFG);
+            t = cfg.ai_tid;
+            cfg.ai_tid += 1;
+        }
+        t
+    }
+    
     pub fn nextrid() -> u32 {
         let mut cfg: &mut RecipeConfig; 
         let mut t: u32 = 0;

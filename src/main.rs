@@ -27,7 +27,7 @@ mod autoinc;
 use serde::{Deserialize, Serialize};
 use rmps::{Deserializer, Serializer};
 use std::mem;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use autoinc::*;
 use helpers::*;
@@ -40,6 +40,7 @@ static mut RECIPELIST: *const Vec<Recipe> = 0 as *const Vec<Recipe>;
 static mut RECIPEDICT: *const HashMap<u32, &mut Recipe> = 0 as *const HashMap<u32, &mut Recipe>;
 static mut CONTRIBLIST: *const Vec<Contrib> = 0 as *const Vec<Contrib>;
 static mut CONTRIBDICT: *const HashMap<u32, &mut Contrib> = 0 as *const HashMap<u32, &mut Contrib>;
+static mut ALLTAGS: *const HashMap<String, u16> = 0 as *const HashMap<String, u16>;
 
 fn main() {
     
@@ -49,6 +50,7 @@ fn main() {
     let mut rdict: HashMap<u32, &mut Recipe> = HashMap::new();
     let mut clist: Vec<Contrib> = Vec::new();
     let mut cdict: HashMap<u32, &mut Contrib> = HashMap::new();
+    let mut atags: HashMap<String, u16> = HashMap::new();
     
     unsafe {
         CFG = mem::transmute(&rcfg);
@@ -56,6 +58,7 @@ fn main() {
         RECIPEDICT = mem::transmute(&rdict);
         CONTRIBLIST = mem::transmute(&clist);
         CONTRIBDICT = mem::transmute(&cdict);
+        ALLTAGS = mem::transmute(&atags);
     }
     
     // show_config();
@@ -68,14 +71,16 @@ fn main() {
             contributor: 30u32,
             ingredients: String::from("Lasagna Noodles\nTomatoes\nCheeses"),
             directions: String::from("1. Cook noodles\n2. Add ingredients\n3. Cook other stuff\n4. More and really long and complicated stuff that requires lots of cooking and patience and requires a cooking level of 99\n5. This is the final step."),
+            tags: Recipe::add_tags(&vec!["italian food".to_string(), "noodles".to_string(), "sauce".to_string()]),
         },
         Recipe {
             rid: 0u32,
             title: String::from("Pizza"),
             date: String::from("2017-05-25"),
             contributor: 22u32,
-            ingredients: String::from("Pizza Dough\n\tFlour\n\tSemolina Flour\n\tEggs\n\tWater\n\tOil\nTomatoes\nCheese"),
+            ingredients: String::from("Pizza Dough\n\tFlour\n\tSemolina Flour\n\tEggs\n\tWater\n\tOil\nTomatoes\nCheese"), 
             directions: String::from("1. Add semolina flour and flour and eggs and oil\n2. Make mixture into dough\n3. Make tomatoes into sauce\n4. Add sauce and cheese and any toppings to the pizza\n5. Bake in oven at ow my hand tempatures\n6. Die from happiness"),
+            tags: Recipe::add_tags(&vec!["za".to_string(), "italian".to_string(), "italian food".to_string(), "college food".to_string(), "customizable".to_string(), "best food ever".to_string()]),
         },
     ];
     
@@ -105,12 +110,14 @@ fn main() {
             comments: String::from("She has an awesome dog named Rosebud and a really an adorable son named Owen."),
         }
     ];
-    
     peoples[0].add();
     peoples[1].add();
     peoples[2].add();
     Contrib::writecontribs();
     Contrib::readcontribs();
+    
+    Recipe::writetags();
+    Recipe::readtags();
     
     recipelist[0].add();
     recipelist[1].add();

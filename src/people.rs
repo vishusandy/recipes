@@ -13,7 +13,7 @@ use autoinc::*;
 use helpers::*;
 use entries::*;
 
-use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT};
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS};
 
 impl Contrib {
     pub fn display(&self) {
@@ -39,7 +39,7 @@ impl Contrib {
         cid
     }
     
-    pub fn add_contrib(c: &Contrib) -> u32 {
+    pub fn add_contrib(c: &Contrib ) -> u32 {
         
         0
     }
@@ -56,7 +56,7 @@ impl Contrib {
         }
         match cdict.get(&id) {
             None => ResultC::Fail("Person id not found"),
-            Some(c) => ResultC::Result(&c),
+            Some(ref c) => ResultC::Result(c),
         }
     }
     
