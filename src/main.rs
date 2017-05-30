@@ -23,6 +23,7 @@ mod entries;
 mod people;
 mod recipe_structs;
 mod autoinc;
+mod tags;
 
 use serde::{Deserialize, Serialize};
 use rmps::{Deserializer, Serializer};
@@ -34,6 +35,7 @@ use helpers::*;
 use recipe_structs::*;
 use entries::*;
 use people::*;
+use tags::*;
 
 static mut CFG: *const RecipeConfig = 0 as *const RecipeConfig;
 static mut RECIPELIST: *const Vec<Recipe> = 0 as *const Vec<Recipe>;
@@ -41,6 +43,7 @@ static mut RECIPEDICT: *const HashMap<u32, &mut Recipe> = 0 as *const HashMap<u3
 static mut CONTRIBLIST: *const Vec<Contrib> = 0 as *const Vec<Contrib>;
 static mut CONTRIBDICT: *const HashMap<u32, &mut Contrib> = 0 as *const HashMap<u32, &mut Contrib>;
 static mut ALLTAGS: *const HashMap<String, u16> = 0 as *const HashMap<String, u16>;
+static mut ALLTIDS: *const HashMap<u16, String> = 0 as *const HashMap<u16, String>;
 
 fn main() {
     
@@ -51,6 +54,7 @@ fn main() {
     let mut clist: Vec<Contrib> = Vec::new();
     let mut cdict: HashMap<u32, &mut Contrib> = HashMap::new();
     let mut atags: HashMap<String, u16> = HashMap::new();
+    let mut atids: HashMap<u16, String> = HashMap::new();
     
     unsafe {
         CFG = mem::transmute(&rcfg);
@@ -59,6 +63,7 @@ fn main() {
         CONTRIBLIST = mem::transmute(&clist);
         CONTRIBDICT = mem::transmute(&cdict);
         ALLTAGS = mem::transmute(&atags);
+        ALLTIDS = mem::transmute(&atids);
     }
     
     // show_config();
@@ -119,6 +124,9 @@ fn main() {
     Recipe::writetags();
     Recipe::readtags();
     
+    Recipe::print_tags();
+    Recipe::print_tids();
+    
     recipelist[0].add();
     recipelist[1].add();
     Recipe::writerecipes();
@@ -126,17 +134,24 @@ fn main() {
     
     // Contrib::writecontribs();
     // Contrib::readcontribs();
-    show_config();
+    // show_config();
 
-    for (_, rec) in rdict {
-        rec.display();
-    }
-    for (_, ctb) in cdict {
-        ctb.display();
-    }
-
-    show_config();
+    // Display recipes
+    // for (_, rec) in rdict { rec.display(); }
     
+    // Display contributors
+    // for (_, ctb) in cdict { ctb.display(); }
+
+    show_config();
     // RecipeConfig::write();
+    
+    // Search Recipes for text string
+    println!("\n----SEARCHING----------------");
+    let searchstr: String = "za".to_string();
+    let tomatoes: Vec<&Recipe> = Recipe::search_text(&searchstr);
+    for item in tomatoes {
+        item.display();
+    }
+    
     
 }

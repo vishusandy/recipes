@@ -9,6 +9,7 @@ use recipe_structs::*;
 use autoinc::*;
 use entries::*;
 use people::*;
+use tags::*;
 
 use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS};
 
@@ -55,7 +56,7 @@ impl RecipeConfig {
         let mut f = BufWriter::new(File::create("recipes.cfg").expect("Could not open configuration file."));
         
         unsafe {
-            f.write(format!("numcontribs = {}\r\nnumrecipes = {}\r\nnextrid = {}\r\nnextcid = {}\n\nnexttid = {}\r\n",
+            f.write(format!("numcontribs = {}\r\nnumrecipes = {}\r\nnextrid = {}\r\nnextcid = {}\r\nnexttid = {}\r\n",
                 (*CFG).num_contribs, (*CFG).num_recipes, (*CFG).ai_rid, (*CFG).ai_cid, (*CFG).ai_tid).as_bytes());
         }
     }

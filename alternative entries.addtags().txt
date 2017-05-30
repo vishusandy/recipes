@@ -1,0 +1,63 @@
+    pub fn add_tags(tags: &Vec<String>) -> Vec<u16> {
+        let mut atags: &mut HashMap<String, u16>;
+        let mut results: Vec<u16> = Vec::new();
+        unsafe {
+            atags = mem::transmute(ALLTAGS);
+        }
+        for tag in tags {
+                /* match atags.get(tag) {
+                    Some(i) => results.push(),
+                    None => ,
+                } */
+            // let mut create = (0u16, "");
+            
+            // Tried using the following line
+            // let newtid = results.push( *atags.entry(tag.to_owned()).or_insert(RecipeConfig::nexttid()) );
+
+            /* if atags.contains_key(tag) {
+                let Some(v) = atags.get(tag);
+                atags.insert(tag, v);
+            } */
+            
+            let mut ntid = 0u16;
+            if !atags.contains_key(tag) {
+                ntid = RecipeConfig::nexttid();
+                print!("Creating new tag {}\n\t", ntid);
+            }
+            
+            // The below code works:
+            let curtid = *atags.entry(tag.to_owned()).or_insert(ntid);
+            print!("Linking tag {}:''{}\n", tag, curtid);
+            results.push(curtid);
+            // let curtid = *atags.entry(tag.to_owned()).or_insert(RecipeConfig::nexttid());
+            
+            
+            // but it would increment the ai_tid when only getting the value and not inserting anything
+            /*
+            // The below code works:
+            let mut create = (0u16, "");
+            {
+                match atags.get(tag) {
+                    Some(tid) => {
+                        results.push(*tid);
+                        println!("Using existing tag {}:'{}'", *tid, tag);
+                    },
+                    None => {
+                        let next = RecipeConfig::nexttid();
+                        println!("Adding new tag {}:''{}", next, tag);
+                        results.push(next);
+                        create = (next, tag);
+                    },
+                }
+            }
+                
+            {
+                if create != (0u16, "") {
+                    atags.insert(create.1.to_string(), create.0);
+                }
+            }
+            */
+        }
+        results
+        //vec![0u16, 5u16, 3u16, 4u16, 2u16]
+    }

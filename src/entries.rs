@@ -12,68 +12,36 @@ use std::collections::{HashMap, HashSet};
 use recipe_structs::*;
 use autoinc::*;
 use helpers::*;
+use tags::*;
+use people::*;
 
-use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS};
+use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS, ALLTIDS};
 
 impl Recipe {    
     pub fn display(&self) {
-        //calculate size of all tags and create a string buffer with that capacity
-        
-        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\n\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions);
-    }
-    
-    pub fn add_tags(tags: &Vec<String>) -> Vec<u16> {
         let mut atags: &mut HashMap<String, u16>;
-        let mut results: Vec<u16> = Vec::new();
+        let mut atids: &mut HashMap<u16, String>;
         unsafe {
             atags = mem::transmute(ALLTAGS);
+            atids = mem::transmute(ALLTIDS);
         }
-        for tag in tags {
-            results.push(
-                *atags.entry(tag.to_owned()).or_insert(RecipeConfig::nexttid())
-            );
+        // todo: maybe: calculate size of all tags and create a string buffer with that capacity
+        let mut buf = String::new();
+        for tid in &self.tags {
+            match atids.get(&tid) {
+                Some(t) => {
+                        buf.push_str(" ");
+                        buf.push_str(&tid.to_string());
+                        buf.push_str(" ");
+                        buf.push_str(t);
+                        buf.push_str(" ");
+                },
+                None => {},
+            }
         }
-        results
-        //vec![0u16, 5u16, 3u16, 4u16, 2u16]
+        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
     }
     
-    pub fn writetags() {
-        let mut atags: &mut HashMap<String, u32>;
-        let cfg: &mut RecipeConfig;
-        unsafe {
-            cfg = mem::transmute(CFG);
-            atags = mem::transmute(ALLTAGS);
-        }
-        let mut fs = File::create("tags.db");
-        let mut f = BufWriter::new(fs.expect("COuld not read tags database"));
-        let mut buf = Vec::new();
-        atags.serialize(&mut Serializer::new(&mut buf)).expect("Could not serialize tags");
-        f.write(&buf);
-    }
-    
-    pub fn readtags() {
-        let mut atags: &mut HashMap<String, u16>;
-        let cfg: &mut RecipeConfig;
-        unsafe {
-            cfg = mem::transmute(CFG);
-            atags = mem::transmute(ALLTAGS);
-        }
-        let mut f = File::open("tags.db").expect("Could not open tags database");
-        let mut buffer = Vec::new();
-        f.read_to_end(&mut buffer);
-        let mut ds = Deserializer::new(&buffer[..]);
-        atags.clear();
-        *atags = Deserialize::deserialize(&mut ds).expect("Could not deserialize tag data");
-        let maxtid: u16 = match atags.iter().max() {
-            Some(a) => *a.1,
-            None => 1u16,
-        };
-        cfg.ai_tid = maxtid;
-    }
-    
-    pub fn remove_tags() {}
-    
-    pub fn edit_tag() {}
     
     pub fn add(&self) -> u32 {
         let mut list: &mut Vec<Recipe>; 
@@ -88,7 +56,7 @@ impl Recipe {
             x => x,
         };
         // list.push(Recipe {
-        list.push(Recipe {
+        list.push(Recipe { 
             rid: rid, title: self.title.to_owned(), date: self.date.to_owned(), contributor: self.contributor, ingredients: self.ingredients.to_owned(), directions: self.directions.to_owned(), tags: self.tags.to_owned(),
         });
         rdict.insert(rid, list.last_mut().unwrap());

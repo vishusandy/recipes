@@ -1,14 +1,33 @@
+
+
 add removecid() and removerid() methods
 
 add editcid() and editrid() methods
 
-add tags to Recipes
+Search methods, take a Vec<Recipe> as &self, return a Vec<Recipe>
+list_recipes(&self, sortby, asc/desc)			lists all recipes
+list_recipes_by(&self, sortby, asc/desc, filterfn)	lists all recipes filtered by a function
+search_cid	lists recipes contributed by a specific person
+search_cids  	    maybe use the .any() method
+search_tags	list recipes with certain tags
 
-add find_tags()
+list_contribs(&self, sortby, asc/desc)
+list_contribs_by(&self, sortby, asc/desc, filterfn)
+
+tag functions
     list_tags()
-    add_tag()
-    remove_tag()
-    edit_tag()
+    create_tag()
+    delete_tag()
+    change_tag()
+
+add the following:
+edit_rid()
+delete_rid()
+
+edit_cid()
+delete_cid()
+
+
 
 date -> NaiveDate
 change date in Recipe and added in Contributor to NaiveDate's from the chrono crate
@@ -19,15 +38,9 @@ add state validation and expansion and contraction methods
 
 
 
-
-
-
-
-
-
-
-
-
+maybe make a String concatenation overload method
+    overload +
+        .to_string() the right side and push_str() it to the left
 
 
 

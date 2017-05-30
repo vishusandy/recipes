@@ -12,12 +12,13 @@ use recipe_structs::*;
 use autoinc::*;
 use helpers::*;
 use entries::*;
+use tags::*;
 
 use {CFG, RECIPELIST, RECIPEDICT, CONTRIBLIST, CONTRIBDICT, ALLTAGS};
 
 impl Contrib {
     pub fn display(&self) {
-        println!("Contributor {}\nName: {}\nAdded on: {}\nLocation: {}, {}\nComments:\n{}\n\n", self.cid, self.name, self.added, self.city, self.state, self.comments);
+        println!("Contributor {}\nName: {}\nAdded on: {}\nLocation: {}, {}\nComments:\n{}\n", self.cid, self.name, self.added, self.city, self.state, self.comments);
     }
     
     pub fn add(&self) -> u32 {

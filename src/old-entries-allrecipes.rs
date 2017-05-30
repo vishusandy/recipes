@@ -173,7 +173,7 @@ const EOS: char = '\u{009c}';
 
 
 
-for record in f.split(30u8) {
+        for record in f.split(30u8) {
             let mut r: Recipe = Recipe {
                                     rid: 0u32,
                                     title: String::new(),
