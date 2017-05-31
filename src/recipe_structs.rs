@@ -5,7 +5,9 @@ use chrono::{DateTime, Date, NaiveDate};
 pub struct Recipe {
     pub rid: u32, //todo: convert to `type RecipeIdx = u32` or enum RecipeIdx instead of u32
     pub title: String,
-    pub date: String, //change to NaiveDate
+    #[serde(with = "naive_date_format")]
+    pub date: NaiveDate,
+    // pub date: String, //change to NaiveDate
     pub contributor: u32, //todo: change to &Contrib
     pub ingredients: String,
     pub directions: String,

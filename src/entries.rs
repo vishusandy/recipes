@@ -8,6 +8,7 @@ use std::io::{self, BufReader, BufWriter};
 use std::mem;
 use std::collections::hash_map::Entry::{Vacant, Occupied};
 use std::collections::{HashMap, HashSet};
+use chrono::NaiveDate;
 // use chrono::NaiveDate;
 use recipe_structs::*;
 use autoinc::*;
@@ -39,6 +40,7 @@ impl Recipe {
                 None => {},
             }
         }
+        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
         println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
     }
     
@@ -164,7 +166,7 @@ impl Recipe {
         
         success
     }
-    
+    /*
     pub fn add_recipe(r: &Recipe) -> u32 {
         // let (rid, title, date, contributor, ingredients, directions) = r.tuple();
         let mut list: &mut Vec<Recipe>;
@@ -214,7 +216,7 @@ impl Recipe {
         let tags = &self.tags;
         (rid, title, date, contributor, ingredients, directions, tags)
     }
-    
+    */
     
 }
 

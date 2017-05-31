@@ -25,6 +25,7 @@ mod recipe_structs;
 mod autoinc;
 mod tags;
 
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use rmps::{Deserializer, Serializer};
 use std::mem;
@@ -72,7 +73,8 @@ fn main() {
         Recipe {
             rid: 0u32,
             title: String::from("Lasagna"),
-            date: String::from("2017-05-26"),
+            // date: String::from("2017-05-26"),
+            date: NaiveDate::from_ymd(2017, 5, 31),
             contributor: 30u32,
             ingredients: String::from("Lasagna Noodles\nTomatoes\nCheeses"),
             directions: String::from("1. Cook noodles\n2. Add ingredients\n3. Cook other stuff\n4. More and really long and complicated stuff that requires lots of cooking and patience and requires a cooking level of 99\n5. This is the final step."),
@@ -81,7 +83,8 @@ fn main() {
         Recipe {
             rid: 0u32,
             title: String::from("Pizza"),
-            date: String::from("2017-05-25"),
+            // date: String::from("2017-05-25"),
+            date: NaiveDate::from_ymd(2017, 5, 31),
             contributor: 22u32,
             ingredients: String::from("Pizza Dough\n\tFlour\n\tSemolina Flour\n\tEggs\n\tWater\n\tOil\nTomatoes\nCheese"), 
             directions: String::from("1. Add semolina flour and flour and eggs and oil\n2. Make mixture into dough\n3. Make tomatoes into sauce\n4. Add sauce and cheese and any toppings to the pizza\n5. Bake in oven at ow my hand tempatures\n6. Die from happiness"),
