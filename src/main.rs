@@ -146,10 +146,10 @@ fn main() {
     // RecipeConfig::write();
     
     // Search Recipes for text string
-    println!("\n----SEARCHING----------------");
     let searchstr: String = "za".to_string();
-    let tomatoes: Vec<&Recipe> = Recipe::search_text(&searchstr);
-    for item in tomatoes {
+    println!("\n----SEARCHING----------------\nSearching for {}", searchstr);
+    let rsts: Vec<&Recipe> = Recipe::search_text(&searchstr);
+    for item in rsts {
         item.display();
     }
     

@@ -1,5 +1,8 @@
 
 
+tags to lowercase on add() not search
+add curreny date on recipe/contrib add of blank date/added field
+
 add removecid() and removerid() methods
 
 add editcid() and editrid() methods
