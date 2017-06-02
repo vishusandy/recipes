@@ -19,12 +19,39 @@ pub fn date_format(d: &str) -> DateFmt {
     let ymd = Regex::new("(?P<year>[0-9]{2}(?:[0-9]{2})?)[\\./-](?P<month>[0-1]?[0-9])[\\./-](?P<day>[0-3]?[0-9])").unwrap();
     let mdy = Regex::new("(?P<month>[0-1]?[0-9])[\\./-](?P<day>[0-3]?[0-9])[\\./-](?P<year>[0-9]{2}(?:[0-9]{2})?)").unwrap();
     
+    /* match ymd.captures(d) {
+        Some(y) => DateForm::Ymd,
+        _ => match mdy.captures(d) {
+            Some(m) => DateForm::Mdy,
+            _ => DateForm::None,
+        }
+    } */
+    
     match ymd.captures(d) {
         Some(c) => DateFmt::Ymd(*&c["year"].parse::<u32>().unwrap_or(1), *&c["month"].parse::<u32>().unwrap_or(1), *&c["day"].parse::<u32>().unwrap_or(1)),
         _       => match mdy.captures(d) {
+                       // Some(c) if &c["year"].len() == 4 => DateFmt::Ymd(*&c["year"].parse::<u32>().unwrap_or(1), *&c["month"].parse::<u32>().unwrap_or(1), *&c["day"].parse::<u32>().unwrap_or(1)),
+                       // Some(c) => DateFmt::Fail("Incorrect date length"),
                        Some(c) => DateFmt::Ymd(*&c["year"].parse::<u32>().unwrap_or(1), *&c["month"].parse::<u32>().unwrap_or(1), *&c["day"].parse::<u32>().unwrap_or(1)),
                        _       => DateFmt::Fail("Text is not of the format: year-month-day  or  month-day-year"),
                    },
+    } 
+    
+}
+
+pub fn to_date<'a>(datestr: &'a str) -> ResultD<'a> {
+    let format: String;
+    let form = date_format(datestr);
+    // match date_format(&datestr) {
+    match form {
+        DateFmt::Ymd(y, m, d) | DateFmt::Mdy(m, d, y) => format = format!("{:04}-{:02}-{:02}", y, m, d),
+        // DateFmt::Mdy(m, d, y) => format = format!("{:04}-{:02}-{:02}", y, m, d),
+        DateFmt::Fail(e) => return ResultD::Fail(e),
+        DateFmt::None => return ResultD::None,
+    }
+    return match format.parse::<NaiveDate>() {
+        Ok(d) => ResultD::Date(d),
+        Err(_) => ResultD::Fail("Could not parse string into NaiveDate"),
     }
 }
  

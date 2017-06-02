@@ -52,15 +52,16 @@ impl Recipe {
         unsafe {
             atags = mem::transmute(ALLTAGS);
         }
-        for tag in tags {
+        for t in tags {
             let mut ntid = 0u16;
-            if !atags.contains_key(tag) {
+            let tag = t.to_lowercase();
+            if !atags.contains_key(&tag) {
                 ntid = RecipeConfig::nexttid();
-                print!("Creating new tag {}\n\t", ntid);
+                // print!("Creating new tag {}\n\t", ntid);
             }
             
             let curtid = *atags.entry(tag.to_owned()).or_insert(ntid);
-            print!("Linking tag {}:''{}\n", curtid, tag);
+            // print!("Linking tag {}:''{}\n", curtid, tag);
             results.push(curtid);
             // let curtid = *atags.entry(tag.to_owned()).or_insert(RecipeConfig::nexttid());
             
@@ -122,8 +123,8 @@ impl Recipe {
             Some(a) => *a.1,
             None => 1u16,
         };*/
-        cfg.ai_tid = maxtid;
-        println!("Read tags with a max value of {}\n", maxtid);
+        cfg.ai_tid = maxtid + 1;
+        // println!("Read tags with a max value of {}\n", maxtid);
         Recipe::maketids();
     }
 

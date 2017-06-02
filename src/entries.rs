@@ -8,7 +8,9 @@ use std::io::{self, BufReader, BufWriter};
 use std::mem;
 use std::collections::hash_map::Entry::{Vacant, Occupied};
 use std::collections::{HashMap, HashSet};
+use std::iter::FromIterator;
 use chrono::NaiveDate;
+use time;
 // use chrono::NaiveDate;
 use recipe_structs::*;
 use autoinc::*;
@@ -22,9 +24,11 @@ impl Recipe {
     pub fn display(&self) {
         let mut atags: &mut HashMap<String, u16>;
         let mut atids: &mut HashMap<u16, String>;
+        let mut cdict: &mut HashMap<u32, &Contrib>;
         unsafe {
             atags = mem::transmute(ALLTAGS);
             atids = mem::transmute(ALLTIDS);
+            cdict = mem::transmute(CONTRIBDICT);
         }
         // todo: maybe: calculate size of all tags and create a string buffer with that capacity
         let mut buf = String::new();
@@ -40,8 +44,16 @@ impl Recipe {
                 None => {},
             }
         }
-        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
-        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
+        let ctb = match cdict.get(&self.contributor) {
+            Some(c) => &c.name,
+            None => "",
+            // None => String::from(""),
+        };
+        // let ctb2 = x if let Some(x) = cdict.get(self.contributor);
+        // let y = if 
+        // ctb = cdict.get(self.contributor);
+        println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, ctb, self.ingredients, self.directions, buf);
+        // println!("Recipe {}\nTitle:\t{}\nDate:\t{}\nContributor:\t{}\nIngredients:\n{}\n\nDirections:\n{}\nTags: {}\n", self.rid, self.title, self.date, self.contributor, self.ingredients, self.directions, buf);
     }
     
     
@@ -64,7 +76,43 @@ impl Recipe {
         rdict.insert(rid, list.last_mut().unwrap());
         rid
     }
-
+    
+    // take date and tags as Strings, convert date to NaiveDate and use add_tags(&Vec<String>) -> Vec<u16>
+    pub fn create(rid: u32, title: String, datestr: String, contributor: u32, ingredients: String, directions: String, tagsstr: String) -> u32 {
+        let mut cfg: &mut RecipeConfig;
+        let mut rlist: &mut Vec<Recipe>;
+        let mut rdict: &mut HashMap<u32, &mut Recipe>;
+        unsafe {
+            cfg = mem::transmute(CFG);
+            rlist = mem::transmute(RECIPELIST);
+            rdict = mem::transmute(RECIPEDICT);
+        }
+        
+        // removed, let Recipe::add() handle the id stuff
+        // let rid: u32 = if id == 0u32 { RecipeConfig::nextrid() } else { id };
+        
+        // let tags: Vec<u16> = Recipe::add_tags(tagsstr.split(" ").map(|s| s.to_string()).collect());
+        
+        let taglist = Vec::from_iter(tagsstr.split(",").map(String::from));
+        let tags = Recipe::add_tags(&taglist);
+        
+        let date: NaiveDate;
+        if let ResultD::Date(d) = to_date(&datestr) {
+            date = d;
+        } else {
+            let today = time::now();
+            date = NaiveDate::from_ymd(
+                (today.tm_year), 
+                ((today.tm_mon + 1) as u32), 
+                (today.tm_mday as u32)
+            );
+        }
+        
+        let rec = Recipe {
+            rid, title, date, contributor, ingredients, directions, tags
+        };
+        rec.add()
+    }
     
     pub fn search_rid<'a>(id: u32) -> ResultR<'a> {
         
@@ -87,15 +135,26 @@ impl Recipe {
         let text = textlower.as_str();
         let mut results: Vec<&Recipe> = Vec::new();
         let list: &Vec<Recipe>;
+        let mut atids: &mut HashMap<u16, String>;
         unsafe {
             list = mem::transmute(RECIPELIST);
+            atids = mem::transmute(ALLTIDS);
         }
         for item in list {
             // if item + 5 == 0 {}
             // todo: match against date and possibly maybe contributor information?
             // todo: search for text in each of the tags associated with the recipe
-            if item.title.to_lowercase().contains(text) || item.ingredients.to_lowercase().contains(text) || item.directions.to_lowercase().contains(text) {
+            let mut intag = false;
+            for tid in &item.tags {
+                match atids.get(tid) {
+                    None => continue,
+                    Some(tag) if tag.contains(text) => intag = true,
+                    Some(_) => continue,
+                }
+            }
+            if intag || item.title.to_lowercase().contains(text) || item.ingredients.to_lowercase().contains(text) || item.directions.to_lowercase().contains(text) {
                 results.push(item);
+                // println!("Found item {}", item.rid);
             }
         }
         results
@@ -161,8 +220,8 @@ impl Recipe {
         
         cfg.ai_rid = maxrid + 1;
         cfg.num_recipes = rdict.len() as u32;
-        println!("Max rid: {}", maxrid);
-        println!("Number of recipes: {}", rdict.len());
+        // println!("Max rid: {}", maxrid);
+        // println!("Number of recipes: {}", rdict.len());
         
         success
     }

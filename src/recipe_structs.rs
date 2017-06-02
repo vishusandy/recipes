@@ -1,6 +1,5 @@
 use chrono::{DateTime, Date, NaiveDate};
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Recipe {
     pub rid: u32, //todo: convert to `type RecipeIdx = u32` or enum RecipeIdx instead of u32
@@ -13,23 +12,13 @@ pub struct Recipe {
     pub directions: String,
     pub tags: Vec<u16>,
 }
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RecipeD {
-    pub rid: u32, //todo: convert to `type RecipeIdx = u32` or enum RecipeIdx instead of u32
-    pub title: String,
-    // pub date: String, //change to NaiveDate
-    #[serde(with = "naive_date_format")]
-    pub date: NaiveDate,
-    pub contributor: u32, //todo: change to &Contrib
-    pub ingredients: String,
-    pub directions: String,
-    pub tags: Vec<u16>,
-}
-    
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Contrib {
     pub cid: u32, //todo: convert to ContribIdx instead of u32
-    pub added: String,
+    // pub added: String,
+    #[serde(with = "naive_date_format")]
+    pub added: NaiveDate,
     pub name: String,
     pub city: String,
     pub state: String,
@@ -62,6 +51,19 @@ pub enum DateFmt<'a> {
     None,
 }
 
+pub enum ResultD<'a> {
+    Date(NaiveDate),
+    Fail(&'a str),
+    None,
+}
+
+/*
+pub enum DateForm {
+    Ymd(String),
+    Mdy,
+    None,
+}
+*/
 
 // use chrono::{DateTime, UTC};
 // use serde::{Deserialize, Serialize};

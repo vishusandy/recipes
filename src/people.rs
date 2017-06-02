@@ -126,8 +126,8 @@ impl Contrib {
         }
         cfg.ai_cid = maxcid + 1;
         cfg.num_contribs = cdict.len() as u32;
-        println!("Max cid: {}", maxcid);
-        println!("Number of contributors: {}", cdict.len());
+        // println!("Max cid: {}", maxcid);
+        // println!("Number of contributors: {}", cdict.len());
         
         success
     }
