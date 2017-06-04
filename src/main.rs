@@ -175,10 +175,6 @@ fn main() {
     // println!("\nShowing Rlist:\n{:#?}", rlist);
     // println!("\nShowing Rdict:\n{:#?}", rdict);
     
-    // println!("Exec time: {:?}", beginning.elapsed());
-    // let test = beginning.elapsed()*100;
-    // println!("Exec time * 100 raw: {:?}", test);
-    // println!("Exec time - 100 as secs: {:?}", test.as_secs());
     let ending = beginning.elapsed();
     println!("Exec time: {}.{:08}", ending.as_secs(), ending.subsec_nanos());
     
